@@ -15,7 +15,7 @@
 - **Constants**: Use `UPPER_SNAKE_CASE` (e.g., `MAX_CONNECTIONS`, `API_KEY`).
 
 ### Spacing and Indentation
-- Use **4 spaces** for indentation (no tabs).
+- Use **1 tab** for indentation.
 - Leave **1 blank line** between functions and **2 blank lines** between classes.
 - Limit line length to **79 characters** (PEP 8 standard).
 
@@ -60,7 +60,7 @@
 - **Constants**: Use `UPPER_SNAKE_CASE` (e.g., `MAX_RESULTS`, `API_ENDPOINT`).
 
 ### Spacing and Indentation
-- Use **2 spaces** for indentation (no tabs).
+- Use **1 tab** for indentation.
 - Leave **1 blank line** between component methods.
 
 ### Commenting
