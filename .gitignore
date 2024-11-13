@@ -1,3 +1,5 @@
+.env
+
 # BACKEND
 /backend/__pycache__
 
