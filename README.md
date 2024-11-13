@@ -37,6 +37,7 @@
 ---
 
 ## Instructions for Setting Up the Project Locally
-- **Each layer has their own README detailing how to setup**
-- **WIP: Script to run both parts of project with one cmd**
-
+- docker-compose build
+- docker-compose up
+- **View Backend at http://127.0.0.1:8000**
+- **View Frontend at http://127.0.0.1:3006**
