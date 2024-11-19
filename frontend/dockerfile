@@ -7,6 +7,10 @@ ENV PATH /app/node_modules/.bin:$PATH
 # install app dependencies
 COPY package.json ./
 COPY package-lock.json ./
+
+# Install dependencies (axios, react-router-dom@6, @testing-library/react)
+RUN npm install --silent axios react-router-dom@6 @testing-library/react
+
 # Silent clean install of npm
 RUN npm ci --silent
 RUN npm install react-scripts@3.4.1 -g --silent
