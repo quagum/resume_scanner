@@ -1,48 +1,56 @@
-from fastapi import FastAPI, Response, status
-from pydantic import BaseModel
+from fastapi import FastAPI, Response, status, Depends
+from sqlalchemy.orm import Session
 import os 
 import bcrypt
 import jwt
 import datetime
-from backend.user_models import User, RegisterPayload, LoginPayload
+from backend.database import models
+from backend.user_models import RegisterPayload, LoginPayload
 
 app = FastAPI()
 
-tmp_database = {}
+def get_db():
+    db = models.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
 @app.post("/api/register")
-async def register(payload: RegisterPayload, response: Response):
+async def register(payload: RegisterPayload, response: Response, db: Session = Depends(get_db)):
     """
       Register account from the given payload.
       
       Args:
         payload (RegisterPayload): The payload containing email, password, username
         response (Response): The FastAPI Response object for setting the status code
-
+        db (Session): A database connection?
       Returns:
         dict: A JSON response with a status message.
       """
     email = payload.email
-    username = payload.username
-    if email not in tmp_database:
-        password = payload.password
-        bytes = password.encode('utf-8') 
-        salt = bcrypt.gensalt() 
-        hashed_password = bcrypt.hashpw(bytes, salt) 
-        user = User(email, username, hashed_password)
-        tmp_database[email] = user
-        response.status_code = status.HTTP_201_CREATED
-        return {"message": "User registered"}
+    db_user = db.query(models.User).filter(models.User.email == email).first()
+    if db_user:
+      response.status_code = status.HTTP_400_BAD_REQUEST
+      return {"error": "Username or email already registered"}
     else:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return {"error": "Username or email already registered"}
+      username = payload.username
+      password = payload.password
+      bytes = password.encode('utf-8') 
+      salt = bcrypt.gensalt() 
+      hashed_password = bcrypt.hashpw(bytes, salt) 
+      user = models.User(email=email, username=username, hashed_password=hashed_password)
+      db.add(user)
+      db.commit()
+      response.status_code = status.HTTP_201_CREATED
+      return {"message": "User registered"}
   
 @app.post("/api/login")
-async def login(payload: LoginPayload, response: Response):
+async def login(payload: LoginPayload, response: Response, db: Session = Depends(get_db)):
     """
       Register account from the given payload.
       
@@ -55,7 +63,8 @@ async def login(payload: LoginPayload, response: Response):
       """
     email = payload.email
     password = payload.password
-    if email in tmp_database and bcrypt.checkpw(password.encode('utf-8'), tmp_database[email].hashed_password):
+    db_user = db.query(models.User).filter(models.User.email == email).first()
+    if db_user and bcrypt.checkpw(password.encode('utf-8'), db.users[email].hashed_password):
       secret = os.getenv('secret')
       algorithm = os.getenv('algorithm')
       payload = {
