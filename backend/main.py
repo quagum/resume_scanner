@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Response, status, UploadFile, Depends
-#from pydantic import BaseModel
+from sqlalchemy.orm import Session
 import os 
 import io 
 import bcrypt
 import jwt
 import datetime
 from database import models
-from user_models import RegisterPayload, LoginPayload
+from user_models import RegisterPayload, LoginPayload, JobDescriptionPayload
 
 resume_file_content = io.BytesIO()
 

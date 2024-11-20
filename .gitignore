@@ -8,5 +8,3 @@
 backend/db.sqlite3
 /backend/database/__pycache__
 /backend/tests/__pycache__
-/backend/tests/__pycache__
-/backend/tests/__pycache__
