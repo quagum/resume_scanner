@@ -8,7 +8,6 @@ pandas==2.1.1
 sqlalchemy==2.0.21
 bcrypt
 pyjwt
-sqlite
 
 # Testing 
 httpx

@@ -4,8 +4,8 @@ import os
 import bcrypt
 import jwt
 import datetime
-from backend.database import models
-from backend.user_models import RegisterPayload, LoginPayload
+from database import models
+from user_models import RegisterPayload, LoginPayload
 
 app = FastAPI()
 

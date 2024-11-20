@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from ..database.models import User
+from backend.database.models import User
 from ..main import app, get_db
 from unittest.mock import MagicMock
 import pytest
