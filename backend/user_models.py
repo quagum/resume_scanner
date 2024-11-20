@@ -15,3 +15,6 @@ class RegisterPayload(BaseUserPayload):
 
 class LoginPayload(BaseUserPayload):
     pass
+
+class JobDescriptionPayload(BaseModel):
+   job_description: str

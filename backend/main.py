@@ -1,14 +1,16 @@
-from fastapi import FastAPI, Response, status
-from pydantic import BaseModel
+from fastapi import FastAPI, Response, status, UploadFile# File, HTTPException
+#from pydantic import BaseModel
 import os 
+import io 
 import bcrypt
 import jwt
 import datetime
-from backend.user_models import User, RegisterPayload, LoginPayload
+from backend.user_models import User, RegisterPayload, LoginPayload, JobDescriptionPayload
 
 app = FastAPI()
 
 tmp_database = {}
+resume_file_content = io.BytesIO()
 
 @app.get("/")
 async def root():
@@ -68,3 +70,51 @@ async def login(payload: LoginPayload, response: Response):
     else:
       response.status_code = status.HTTP_400_BAD_REQUEST
       return {"error": "Email or password is not recognized"}
+
+@app.post("/api/resume-upload")
+async def resume_upload(file: UploadFile, response: Response):
+    max_file_size = 2 * 1024 * 1024 * 1024
+    allowed_types = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+    if file.content_type in allowed_types:
+      file_size = 0
+      chunk_size = 1024 * 1024
+      while chunk := await file.read(chunk_size):
+          resume_file_content.write(chunk)
+          file_size += len(chunk)
+          if file_size > max_file_size:
+              response.status_code = status.HTTP_400_BAD_REQUEST
+              return {
+                  "error": "File size exceeds the 2GB limit.",
+                  "status": "error"
+              }
+      resume_file_content.seek(0)
+      response.status_code = status.HTTP_200_OK
+      return {
+          "message": "Resume uploaded successfully.",
+          "status": "success"
+        }
+    else:
+      response.status_code = status.HTTP_400_BAD_REQUEST
+      return {
+        "error": "Invalid file type. Only PDF files are allowed.",
+        "status": "error"
+        }
+      
+@app.post("/api/job-description")
+async def job_description_upload(payload: JobDescriptionPayload, response: Response):
+  job_description = payload.job_description
+  job_description.strip()
+  max_char_count = 5000
+  if len(job_description) <= max_char_count:
+    response.status_code = status.HTTP_200_OK
+    return {
+      "message": "Job description submitted successfully.",
+      "status": "success"
+    }
+  else:
+    response.status_code = status.HTTP_400_BAD_REQUEST
+    return {
+      "error": "Job description exceeds character limit.",
+      "status": "error"
+    }
+
