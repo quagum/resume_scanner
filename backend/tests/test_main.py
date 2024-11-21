@@ -1,39 +1,49 @@
 from fastapi.testclient import TestClient
-from ..main import app, tmp_database
+from backend.database.models import User
+from ..main import app, get_db
+from unittest.mock import MagicMock
+import pytest
+import os
+from io import BytesIO
+import jwt
 import bcrypt
-
+"""
+Setup and helper
+"""
 client = TestClient(app)
 
-def test_register_success():
-    tmp_database.clear()
-    
-    payload = {
-        "email": "test@example.com",
-        "password": "securePassword123",
-        "username": "testuser"
-    }
-    
-    response = client.post("/api/register", json=payload)
+mock_session = MagicMock()
+def override_get_db():
+    try:
+        yield mock_session
+    finally:
+        pass
+app.dependency_overrides[get_db] = override_get_db
+
+@pytest.fixture
+def mock_db_session():
+    return mock_session
+
+register_payload_1 = {
+    "email": "test@example.com",
+    "password": "securePassword123",
+    "username": "testuser"
+}
+
+"""
+Tests
+"""
+def test_register_success(mock_db_session):
+    mock_db_session.query.return_value.filter.return_value.first.return_value = None
+    response = client.post("/api/register", json=register_payload_1)
     assert response.status_code == 201
     assert response.json() == {"message": "User registered"}
-    
-    # Verify password is hashed
-    entry = (payload["email"], payload["username"])
-    assert entry in tmp_database
-    assert bcrypt.checkpw(payload["password"].encode('utf-8'), tmp_database[entry])
 
-def test_register_duplicate():
-    tmp_database.clear()
-
-    payload = {
-        "email": "duplicate@example.com",
-        "password": "password123",
-        "username": "duplicateuser"
-    }
-    tmp_database[(payload["email"], payload["username"])] = bcrypt.hashpw(payload["password"].encode('utf-8'), bcrypt.gensalt())
-
-    # Attempt to register the same entry
-    response = client.post("/api/register", json=payload)
+def test_register_duplicate(mock_db_session):
+    existing_user = User(email="test@example.com", username="testuser", hashed_password="hashedpassword123")
+    mock_db_session.query.return_value.filter.return_value.first.return_value = existing_user
+    client.post("/api/register", json=register_payload_1)
+    response = client.post("/api/register", json=register_payload_1)
     assert response.status_code == 400
     assert response.json() == {"error": "Username or email already registered"}
 
@@ -43,6 +53,104 @@ def test_register_missing_field():
         "password": "pass123"
         # Missing "username" field
     }
-    
     response = client.post("/api/register", json=payload)
     assert response.status_code == 422  # Unprocessable Entity for validation error
+
+def test_login_success(mock_db_session):
+    mock_password = "hashedpassword123"
+    mock_hashed_password = bcrypt.hashpw(mock_password.encode('utf-8'), bcrypt.gensalt())
+    existing_user = User(email="test@example.com", username="testuser", hashed_password=mock_hashed_password)
+    mock_db_session.query.return_value.filter.return_value.first.return_value = existing_user
+    mock_db_session.users[existing_user.email].hashed_password = existing_user.hashed_password
+    login_payload = {
+            "email": "test@example.com",
+            "password": "hashedpassword123"
+    }
+    response = client.post("/api/login", json=login_payload)
+    secret = os.getenv('secret')
+    algorithm = os.getenv('algorithm')
+    assert response.status_code == 200
+    data = response.json()
+    generated_token = data["token"]
+    decoded_token = jwt.decode(generated_token, secret, algorithms=[algorithm])
+    assert decoded_token["email"] == login_payload["email"]
+
+def test_login_fail(mock_db_session):
+    mock_password = "hashedpassword123"
+    mock_hashed_password = bcrypt.hashpw(mock_password.encode('utf-8'), bcrypt.gensalt())
+    existing_user = User(email="test@example.com", username="testuser", hashed_password=mock_hashed_password)
+    mock_db_session.query.return_value.filter.return_value.first.return_value = existing_user
+    mock_db_session.users[existing_user.email].hashed_password = existing_user.hashed_password
+    login_payload = {
+            "email": "test@example.com",
+            "password": "superWrongPassword123",
+    }
+    response = client.post("/api/login", json=login_payload)
+    assert response.status_code == 400
+    data = response.json()
+    assert data["error"] == "Email or password is not recognized"
+
+def test_login_nonexistent_user(mock_db_session):
+    mock_db_session.query.return_value.filter.return_value.first.return_value = None
+    payload = {
+        "email": "nonexistent@example.com", 
+        "password": register_payload_1["password"]
+    }
+    response = client.post("/api/login", json=payload)
+    assert response.status_code == 400
+    data = response.json()
+    assert data["error"] == "Email or password is not recognized"
+
+def test_successful_resume_upload():
+    file_content = BytesIO(b"%PDF-1.4 This is a test PDF file.")
+    response = client.post(
+        "/api/resume-upload",
+        files={"file": ("test.pdf", file_content, "application/pdf")},
+    )
+    assert response.status_code == 200
+    assert response.json()["message"] == "Resume uploaded successfully."
+    assert response.json()["status"] == "success"
+
+def test_fail_resume_upload_invalid_file_type():
+    file_content = BytesIO(b"This is not a valid PDF file.")
+    response = client.post(
+        "/api/resume-upload",
+        files={"file": ("test.txt", file_content, "text/plain")},
+    )
+    assert response.status_code == 400
+    assert response.json()["error"] == "Invalid file type. Only PDF files are allowed."
+    assert response.json()["status"] == "error"
+
+def test_fail_resume_upload_oversized_file():
+    oversized_file = BytesIO(b"A" * (2 * 1024 * 1024 * 1024 + 1))
+    response = client.post(
+        "/api/resume-upload",
+        files={"file": ("large.pdf", oversized_file, "application/pdf")},
+    )
+    assert response.status_code == 400
+    assert response.json()["error"] == "File size exceeds the 2GB limit."
+    assert response.json()["status"] == "error"
+
+def test_sucessful_job_description_upload():
+    job_description_payload = {
+        "job_description": "This is a test job description"
+    }
+    response = client.post(
+        "/api/job-description",
+        json=job_description_payload
+    )
+    assert response.status_code == 200
+    assert response.json()["message"] == "Job description submitted successfully."
+    assert response.json()["status"] == "success"
+
+def test_fail_job_description_upload_invalid_length():
+    job_description_payload = {
+        "job_description": "A"*5001
+    }
+    response = client.post(
+        "/api/job-description",
+        json=job_description_payload
+    )
+    assert response.status_code == 400
+    assert response.json()["error"] == "Job description exceeds character limit."
+    assert response.json()["status"] == "error"
