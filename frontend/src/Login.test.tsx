@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import {describe, expect, jest, test} from '@jest/globals';
 import axios from "axios"
 import "@testing-library/jest-dom";
-import Login from "./Login"
+import Login from "./components/Login"
 
 describe("Login Form", () => {
     test("renders all form fields", () => {

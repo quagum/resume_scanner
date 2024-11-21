@@ -44,3 +44,5 @@ const Login: React.FC = () => {
         </form>
     );
 };
+
+export default Login;
