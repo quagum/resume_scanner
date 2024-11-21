@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import axios from "axios";
+import "./styles/styles.css"; // General styles
+import "./styles/signup.css"; // Page-specific styles
+
 
 const SignUp: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -43,38 +46,46 @@ const SignUp: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}></form>
-            <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-            />
-            <input
-                type="text"
-                name="username"
-                placeholder="Username"
-                value={formData.username}
-                onChange={handleChange}
-            />
-            <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-            />
-            <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-            />
-            {error && <p>{error}</p>}
-            <button type="submit">Sign Up</button>
-        </form>
+        <div className="container">
+            <div className="form-wrapper signup-wrapper">
+                <h2>Sign Up</h2>
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        value={formData.email}
+                        onChange={handleChange}
+                    />
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                        value={formData.username}
+                        onChange={handleChange}
+                    />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        value={formData.password}
+                        onChange={handleChange}
+                    />
+                    <input
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Confirm Password"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                    />
+                    {error && <p>{error}</p>}
+                    <button type="submit">Sign Up</button>
+                </form>
+                <div className="link">
+                    <a href="/login">Already have an account? Login here</a> 
+                </div>   
+            </div>
+        </div>
     );
 };
 

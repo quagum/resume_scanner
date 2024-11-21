@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from "axios";
+import "./styles/styles.css"; // General styles
+import "./styles/login.css"; // Page-specific styles
 
 const Login: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -26,22 +28,30 @@ const Login: React.FC = () => {
         }
     };
     return (
-        <form onSubmit={handleSubmit}>
-            <input 
-                type="email"
-                name="email"
-                placeholder="Email"
-                onChange={handleChange}
-            />
-            <input 
-                type="password"
-                name="password"
-                placeholder="Password"
-                onChange={handleChange}
-            />
-            {error && <p>{error}</p>}
-            <button type="submit">Login</button>
-        </form>
+        <div className="container">
+            <div className="form-wrapper login-wrapper">
+                <h2>Login</h2>
+                <form onSubmit={handleSubmit}>
+                    <input 
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        onChange={handleChange}
+                    />
+                    <input 
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        onChange={handleChange}
+                    />
+                    {error && <p>{error}</p>}
+                    <button type="submit">Login</button>
+                </form>
+                <div className="link">
+                    <a href="/signup">Don't have an account? Sign up</a>
+                </div>
+            </div>
+        </div>
     );
 };
 
