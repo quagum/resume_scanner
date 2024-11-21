@@ -45,7 +45,7 @@ describe("SignUp Form", () => {
         //Mock Axios POST request
         axios.post = jest.fn();
         axios.post.mockImplementationOnce(() => 
-            Promise.resolve.({ data })
+            Promise.resolve({ data })
         );
 
         render(<SignUp />);
