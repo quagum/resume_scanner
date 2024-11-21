@@ -22,5 +22,6 @@
   },
   "include": [
     "src"
-  ]
+, "../../.vscode/App.test.tsx"  ], 
+  "types": ["node", "jest", "@testing-library/jest-dom"],
 }

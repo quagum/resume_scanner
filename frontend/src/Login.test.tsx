@@ -1,4 +1,5 @@
 import React from "react";
+import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from "@testing-library/react";
 import {describe, expect, jest, test} from '@jest/globals';
 import axios from "axios"
@@ -10,7 +11,7 @@ describe("Login Form", () => {
         render(<Login />);
 
         //Check if input fields are present
-        expect(screen.getPlaceholderText("Email")).toBeInTheDocument();
+        expect(screen.getByPlaceholderText("Email")).toBeInTheDocument();
         expect(screen.getByPlaceholderText("Password")).toBeInTheDocument();
 
         //Check if the Login button is present

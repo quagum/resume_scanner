@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from "axios";
-import "./styles/styles.css"; // General styles
-import "./styles/signup.css"; // Page-specific styles
+import "../styles/styles.css"; // General styles
+import "../styles/signup.css"; // Page-specific styles
 
 
 const SignUp: React.FC = () => {
@@ -15,7 +15,7 @@ const SignUp: React.FC = () => {
     const [error, setError] = useState("");
     
     //Setting values for formData after user input
-    const handleChange = (e = React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
