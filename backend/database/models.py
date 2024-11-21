@@ -16,7 +16,7 @@ class User(Base):
         self.username = username
         self.hashed_password = hashed_password
         
-DATABASE_URL = "sqlite:///./db.sqlite3"
+DATABASE_URL = "sqlite:///./database/database.db"
 engine = create_engine(DATABASE_URL)
 
 Base.metadata.create_all(bind=engine)

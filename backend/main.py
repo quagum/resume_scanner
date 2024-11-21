@@ -67,7 +67,7 @@ async def login(payload: LoginPayload, response: Response, db: Session = Depends
     email = payload.email
     password = payload.password
     db_user = db.query(models.User).filter(models.User.email == email).first()
-    if db_user and bcrypt.checkpw(password.encode('utf-8'), db.users[email].hashed_password):
+    if db_user and bcrypt.checkpw(password.encode('utf-8'), db.query(models.User).filter(models.User.email == email).first().hashed_password):
       secret = os.getenv('secret')
       algorithm = os.getenv('algorithm')
       payload = {
