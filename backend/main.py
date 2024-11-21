@@ -5,12 +5,26 @@ import io
 import bcrypt
 import jwt
 import datetime
+from fastapi.middleware.cors import CORSMiddleware
 from database import models
 from user_models import RegisterPayload, LoginPayload, JobDescriptionPayload
 
 resume_file_content = io.BytesIO()
 
 app = FastAPI()
+
+
+origins = [
+    "http://localhost:3006"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_db():
     db = models.SessionLocal()
