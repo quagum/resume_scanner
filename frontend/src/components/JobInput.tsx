@@ -11,7 +11,7 @@ const TextAreaInput: React.FC<TextAreaInputProps> = ({ label }) => {
   const handleSubmit = async () => {
     try {
       const response = await axios.post("http://localhost:8000/api/job-description", {
-        job_description: text,
+        job_description: text
       });
       alert(response.data.message);
     } catch (error) {

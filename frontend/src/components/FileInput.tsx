@@ -16,8 +16,8 @@ const FileInput: React.FC<FileInputProps> = ({ label }) => {
     try {
       const response = await axios.post("http://localhost:8000/api/resume-upload", formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
-        },
+          "Content-Type": "multipart/form-data"
+        }
       });
       alert(response.data.message);
     } catch (error) {
