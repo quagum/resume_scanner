@@ -21,7 +21,7 @@ const SignUp: React.FC = () => {
 
         //Validate passwords match
         if (formData.password !== formData.confirmPassword) {
-            setError("Password do not match.");
+            setError("Passwords do not match.");
             return;
         }
 

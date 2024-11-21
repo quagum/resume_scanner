@@ -8,8 +8,8 @@ ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json ./
 COPY package-lock.json ./
 
-# Install dependencies (axios, react-router-dom@6, @testing-library/react)
-RUN npm install --silent axios react-router-dom@6 @testing-library/react
+# Install dependencies (axios, react-router-dom@6, @testing-library/react, @testing-library/jest-dom, @testing-library/user-event)
+RUN npm install --silent --save-dev jest @testing-library/react @testing-library/jest-dom @jest/globals @testing-library/user-event axios react-router-dom@6
 
 # Silent clean install of npm
 RUN npm ci --silent
