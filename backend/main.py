@@ -15,7 +15,7 @@ app = FastAPI()
 
 
 origins = [
-    "http://localhost:3006"
+    "http://localhost:3000"
 ]
 
 app.add_middleware(
@@ -126,19 +126,22 @@ async def resume_upload(file: UploadFile, response: Response):
       
 @app.post("/api/job-description")
 async def job_description_upload(payload: JobDescriptionPayload, response: Response):
-  job_description = payload.job_description
-  job_description.strip()
-  max_char_count = 5000
-  if len(job_description) <= max_char_count:
-    response.status_code = status.HTTP_200_OK
-    return {
-      "message": "Job description submitted successfully.",
-      "status": "success"
-    }
-  else:
-    response.status_code = status.HTTP_400_BAD_REQUEST
-    return {
-      "error": "Job description exceeds character limit.",
-      "status": "error"
-    }
+  try:
+    job_description = payload.job_description
+    job_description.strip()
+    max_char_count = 5000
+    if len(job_description) <= max_char_count:
+      response.status_code = status.HTTP_200_OK
+      return {
+        "message": "Job description submitted successfully.",
+        "status": "success"
+      }
+    else:
+      response.status_code = status.HTTP_400_BAD_REQUEST
+      return {
+        "error": "Job description exceeds character limit.",
+        "status": "error"
+      }
+  except Exception as e: 
+    return {"error": str(e)}
 
