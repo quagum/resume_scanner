@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import "../styles/styles.css"; // General styles
 import "../styles/form/signup.css"; // Page-specific styles
 
 
 const SignUp: React.FC = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: "", 
         password: "",
@@ -41,6 +43,7 @@ const SignUp: React.FC = () => {
             //console.log("Registration successful:", response.data);
             alert(response.data.message);
             setError("");
+            navigate('/login');
         } catch (err) {
             alert("Failed to register account. Please try again.");
             setError("Registration failed");

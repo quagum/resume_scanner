@@ -3,8 +3,11 @@ import SkillsMatched from './SkillsMatched';
 import ImprovementSuggestions from './ImprovementSuggestions';
 import ResumeView from './ResumeView';
 import "../../styles/dashboard/dashboard.css";
+import CheckToken from '../CheckToken';
+
 
 const Dashboard = () => {
+  CheckToken();
   return (
     <div className="dashboard-container">
       {/* Grid Layout */}
