@@ -1,5 +1,6 @@
 import React from "react";
 import ResumeJobInputForm from "./components/InputComp";
+import "./components/style.css";
 
 const App: React.FC = () => {
   return (

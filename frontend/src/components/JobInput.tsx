@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./style.css";
 
 interface TextAreaInputProps {
   label: string;
