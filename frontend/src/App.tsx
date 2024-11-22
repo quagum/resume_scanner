@@ -4,6 +4,7 @@ import './styles/App.css';
 import SignUp from './components/SignUp';
 import Login from './components/Login';
 import ResumeJobInputForm from "./components/InputComp";
+import "./components/style.css";
 
 
 
