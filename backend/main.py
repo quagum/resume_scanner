@@ -86,7 +86,7 @@ async def login(payload: LoginPayload, response: Response, db: Session = Depends
       algorithm = os.getenv('algorithm')
       payload = {
           "email" : email,
-          "exp" : datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+          "exp" : (datetime.datetime.utcnow() + datetime.timedelta(hours=1)).timestamp()
       }
       jwt_token = jwt.encode(payload, secret, algorithm)
       response.status_code = status.HTTP_200_OK
