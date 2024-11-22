@@ -5,9 +5,6 @@ import SignUp from './components/SignUp';
 import Login from './components/Login';
 import ResumeJobInputForm from "./components/form/InputComp";
 import Dashboard from "./components/dashboard/Dashboard";
-import "./components/style.css";
-
-
 
 const App: React.FC = () => {
   return (

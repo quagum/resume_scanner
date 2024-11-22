@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./style.css"; // Import global styles
+import "../../styles/styles.css"; // Import global styles
 
 interface JobInputProps {
   label: string;
