@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from "axios";
 import "../styles/styles.css"; // General styles
-import "../styles/signup.css"; // Page-specific styles
+import "../styles/form/signup.css"; // Page-specific styles
 
 
 const SignUp: React.FC = () => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from "axios";
 import "../styles/styles.css"; // General styles
-import "../styles/login.css"; // Page-specific styles
+import "../styles/form/login.css"; // Page-specific styles
 
 const Login: React.FC = () => {
     const [formData, setFormData] = useState({

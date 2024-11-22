@@ -3,10 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './styles/App.css';
 import SignUp from './components/SignUp';
 import Login from './components/Login';
-import ResumeJobInputForm from "./components/InputComp";
-import "./components/style.css";
-
-
+import ResumeJobInputForm from "./components/form/InputComp";
+import Dashboard from "./components/dashboard/Dashboard";
 
 const App: React.FC = () => {
   return (
@@ -17,6 +15,7 @@ const App: React.FC = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/inputForm" element={<ResumeJobInputForm />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
   );
