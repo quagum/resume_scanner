@@ -21,10 +21,18 @@ const Login: React.FC = () => {
         e.preventDefault();
         try {
             const response = await axios.post("http://localhost:8000/api/login", formData);
-            //console.log(response.data);
-            //alert("response.data.token");
-            alert("Login successful!")
-            setError("");
+            //Check to see if JWT token is received from backend. If so, store in localStorage.
+            if (response.data.token) {
+                localStorage.setItem("jwtToken", response.data.token);
+                alert("Login successful!")
+                setError("");
+
+                //Redirect to the dashboard
+                window.location.href = "/dashboard";
+            } else {
+                alert("Login failed: No token returned.");
+                setError("Login failed: No token returned.");
+            }
         } catch (err) {
             alert("Failed to login. Please try again.");
             setError("Login Failed");
