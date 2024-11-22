@@ -20,10 +20,12 @@ const Login: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post("/api/login", formData);
-            console.log(response.data);
+            const response = await axios.post("http://localhost:8000/api/login", formData);
+            //console.log(response.data);
+            alert(response.data.message);
             setError("");
         } catch (err) {
+            alert("Failed to login. Please try again.");
             setError("Login Failed");
         }
     };

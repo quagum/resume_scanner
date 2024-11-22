@@ -37,11 +37,13 @@ const SignUp: React.FC = () => {
 
         //Using Axios to send to backend
         try {
-            const response = await axios.post("/api/register", payload);
-            console.log("Registration successful:", response.data);
+            const response = await axios.post("http://localhost:8000/api/register", payload);
+            //console.log("Registration successful:", response.data);
+            alert(response.data.message);
             setError("");
         } catch (err) {
-            setError("Registration failed")
+            alert("Failed to register account. Please try again.");
+            setError("Registration failed");
         }
     };
 
