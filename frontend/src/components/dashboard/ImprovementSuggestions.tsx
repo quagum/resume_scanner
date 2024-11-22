@@ -1,3 +1,4 @@
+import "../../styles/dashboard/improvement_suggestions.css";
 const ImprovementSuggestions = () => {
   const suggestions = [
     'Include more action verbs.',
@@ -6,11 +7,13 @@ const ImprovementSuggestions = () => {
   ]; // Example data
 
   return (
-    <div className="bg-white p-4 shadow rounded">
-      <h2 className="text-xl font-semibold mb-4">Improvement Suggestions</h2>
-      <ul className="list-disc pl-5 space-y-2">
+    <div className="improvement-suggestions-container">
+      <h2 className="improvement-suggestions-title">Improvement Suggestions</h2>
+      <ul className="improvement-suggestions-list">
         {suggestions.map((suggestion, index) => (
-          <li key={index} className="text-gray-700">{suggestion}</li>
+          <li key={index} className="improvement-suggestions-item">
+            {suggestion}
+          </li>
         ))}
       </ul>
     </div>

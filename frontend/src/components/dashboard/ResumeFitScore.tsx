@@ -1,14 +1,15 @@
 import ProgressBar from '../shared/ProgressBar';
+import "../../styles/dashboard/resume_fit_score.css";
 
 const ResumeFitScore = () => {
   const fitScore = 78; // Example score
   
   return (
-    <div className="bg-white p-4 shadow rounded">
-      <h2 className="text-xl font-semibold mb-4">Resume Fit Score</h2>
-      <div className="flex items-center space-x-4">
+    <div className="resume-fit-score-container">
+      <h2 className="resume-fit-score-title">Resume Fit Score</h2>
+      <div className="resume-fit-score-content">
         <ProgressBar value={fitScore} />
-        <span className="text-lg font-medium">{fitScore}%</span>
+        <span className="resume-fit-score-percentage">{fitScore}%</span>
       </div>
     </div>
   );
