@@ -23,8 +23,8 @@ const Login: React.FC = () => {
         e.preventDefault();
         try {
             const response = await axios.post("http://localhost:8000/api/login", formData);
-            //console.log(response.data);
-            //alert("response.data.token");
+            console.log(response.data.token);
+            localStorage.setItem('token', response.data.token);
             setError("");
             navigate("/dashboard")
         } catch (err) {
