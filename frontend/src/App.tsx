@@ -8,8 +8,8 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Render the Sign Up component as landing page*/}
-        <Route path="/" element={<SignUp />} />
+        {/* Render the Login component as landing page*/}
+        <Route path="/" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
       </Routes>
