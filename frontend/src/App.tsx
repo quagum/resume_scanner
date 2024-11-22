@@ -1,12 +1,12 @@
-import React from 'react';
-import logo from './logo.svg';
-import './styles/App.css';
-import Dashboard from './components/dashboard/Dashboard';
+import React from "react";
+import ResumeJobInputForm from "./components/InputComp";
 
-function App() {
+const App: React.FC = () => {
   return (
-    Dashboard()
-  )
-}
+    <div>
+      <ResumeJobInputForm />
+    </div>
+  );
+};
 
 export default App;

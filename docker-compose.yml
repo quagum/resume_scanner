@@ -19,6 +19,6 @@ services:
       dockerfile: ./Dockerfile
     restart: always
     ports:
-      - "127.0.0.1:3006:3006"
+      - "127.0.0.1:3000:3000"
     expose:
-      - 3006
+      - 3000
