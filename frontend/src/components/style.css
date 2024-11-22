@@ -1,3 +1,4 @@
+/* Global Styling */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -44,4 +45,53 @@ body {
     font-size: 24px;
     margin-bottom: 20px;
   }
+
+/* FileInput.tsx styling */
   
+.input-container {
+  margin-bottom: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #555;
+}
+
+.input-textarea {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.char-counter {
+  margin-top: 5px;
+  font-size: 14px;
+  color: #666;
+  text-align: right;
+}
+
+.char-counter-exceeded {
+  color: red;
+}
+
+.submit-button {
+  margin-top: 10px;
+  padding: 10px 15px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+}
