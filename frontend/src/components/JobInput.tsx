@@ -21,20 +21,30 @@ const TextAreaInput: React.FC<TextAreaInputProps> = ({ label }) => {
     }
   };
 
+
   return (
-    <div>
-      <label>{label}</label>
+    <div className="input-container">
+      <label className="input-label">{label}</label>
       <textarea
+        className="input-textarea"
         rows={5}
         value={text}
         onChange={(e) => setText(e.target.value)}
-        style={{ width: "100%", marginTop: "5px" }}
+        placeholder="Enter the job description here..."
       />
-      <button onClick={handleSubmit} style={{ marginTop: "10px" }}>
+      <div
+        className={`char-counter ${
+          text.length > 5000 ? "char-counter-exceeded" : ""
+        }`}
+      >
+        {text.length} / 5000 characters
+      </div>
+      <button className="submit-button" onClick={handleSubmit}>
         Submit
       </button>
     </div>
   );
 };
+
 
 export default TextAreaInput;
