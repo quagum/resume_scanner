@@ -22,7 +22,8 @@ const Login: React.FC = () => {
         try {
             const response = await axios.post("http://localhost:8000/api/login", formData);
             //console.log(response.data);
-            alert(response.data.message);
+            //alert("response.data.token");
+            alert("Login successful!")
             setError("");
         } catch (err) {
             alert("Failed to login. Please try again.");
