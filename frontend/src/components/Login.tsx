@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import "../styles/styles.css"; // General styles
-import "../styles/login.css"; // Page-specific styles
+import "../styles/form/login.css"; // Page-specific styles
 
 const Login: React.FC = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -21,18 +23,10 @@ const Login: React.FC = () => {
         e.preventDefault();
         try {
             const response = await axios.post("http://localhost:8000/api/login", formData);
-            //Check to see if JWT token is received from backend. If so, store in localStorage.
-            if (response.data.token) {
-                localStorage.setItem("jwtToken", response.data.token);
-                alert("Login successful!")
-                setError("");
-
-                //Redirect to the dashboard
-                window.location.href = "/dashboard";
-            } else {
-                alert("Login failed: No token returned.");
-                setError("Login failed: No token returned.");
-            }
+            console.log(response.data.token);
+            localStorage.setItem('token', response.data.token);
+            setError("");
+            navigate("/dashboard")
         } catch (err) {
             alert("Failed to login. Please try again.");
             setError("Login Failed");

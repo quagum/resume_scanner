@@ -38,9 +38,11 @@
 
 ## Instructions for Setting Up the Project Locally
 - create .env file under /resume_scanner and include the following in the .env file
-- PYTHONPATH=.
-- secret="superSecret"
-- algorithm="HS256"
+    ```
+    PYTHONPATH=.
+    secret="superSecret"
+    algorithm="HS256" 
+    ```
 
 - docker-compose build
 - docker-compose up
