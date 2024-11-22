@@ -1,26 +1,36 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./style.css";
+import "./style.css"; // Import global styles
 
-interface TextAreaInputProps {
+interface JobInputProps {
   label: string;
+  softLimit: number; // character count soft limit for character count warning
+  hardLimit: number; // character count hard limit restriction
 }
 
-const TextAreaInput: React.FC<TextAreaInputProps> = ({ label }) => {
+const JobInput: React.FC<JobInputProps> = ({ label }) => {
   const [text, setText] = useState<string>("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (e.target.value.length <= 7000) {
+      setText(e.target.value);
+    }
+  };
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("http://localhost:8000/api/job-description", {
-        job_description: text
-      });
+      const response = await axios.post(
+        "http://localhost:8000/api/job-description",
+        {
+          job_description: text,
+        }
+      );
       alert(response.data.message);
     } catch (error) {
       console.error(error);
       alert("Failed to submit the job description. Please try again.");
     }
   };
-
 
   return (
     <div className="input-container">
@@ -29,7 +39,7 @@ const TextAreaInput: React.FC<TextAreaInputProps> = ({ label }) => {
         className="input-textarea"
         rows={5}
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={handleChange}
         placeholder="Enter the job description here..."
       />
       <div
@@ -46,5 +56,4 @@ const TextAreaInput: React.FC<TextAreaInputProps> = ({ label }) => {
   );
 };
 
-
-export default TextAreaInput;
+export default JobInput;
