@@ -22,5 +22,6 @@
   },
   "include": [
     "src"
-  ]
+, "../../.vscode/App.test.tsx", "../../.vscode/SignUp.test.tsx", "../../.vscode/Login.test.tsx"  ], 
+  "types": ["node", "jest", "@testing-library/jest-dom"],
 }
