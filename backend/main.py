@@ -8,11 +8,11 @@ import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from database import models
 from user_models import RegisterPayload, LoginPayload, JobDescriptionPayload
+from PyPDF2 import PdfReader
 
 resume_file_content = io.BytesIO()
 
 app = FastAPI()
-
 
 origins = [
     "http://localhost:3000"
@@ -97,51 +97,69 @@ async def login(payload: LoginPayload, response: Response, db: Session = Depends
 
 @app.post("/api/resume-upload")
 async def resume_upload(file: UploadFile, response: Response):
-    max_file_size = 2 * 1024 * 1024 * 1024
-    allowed_types = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
-    if file.content_type in allowed_types:
-      file_size = 0
-      chunk_size = 1024 * 1024
-      while chunk := await file.read(chunk_size):
-          resume_file_content.write(chunk)
-          file_size += len(chunk)
-          if file_size > max_file_size:
-              response.status_code = status.HTTP_400_BAD_REQUEST
-              return {
-                  "error": "File size exceeds the 2GB limit.",
-                  "status": "error"
-              }
-      resume_file_content.seek(0)
-      response.status_code = status.HTTP_200_OK
-      return {
-          "message": "Resume uploaded successfully.",
-          "status": "success"
-        }
-    else:
-      response.status_code = status.HTTP_400_BAD_REQUEST
-      return {
-        "error": "Invalid file type. Only PDF files are allowed.",
-        "status": "error"
-        }
+    max_file_size = 2 * 1024 * 1024
+    allowed_types = ["application/pdf"]
+
+    # Validate file type
+    if file.content_type not in allowed_types:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error": "Invalid file type. Only PDF files are allowed.", "status": "error"}
+
+    # Read file content
+    file_content = await file.read()
+    if len(file_content) > max_file_size:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error": "File size exceeds the 2MB limit.", "status": "error"}
+
+    # Extract and validate text
+    try:
+        text = extract_text_from_pdf(io.BytesIO(file_content))
+        if len(text) > 5000:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"error": "File contains more than 5,000 characters.", "status": "error"}
+    except ValueError as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error": f"Error processing PDF: {str(e)}", "status": "error"}
+
+    response.status_code = status.HTTP_200_OK
+    return {"message": "Resume uploaded successfully.", "status": "success"}
       
 @app.post("/api/job-description")
 async def job_description_upload(payload: JobDescriptionPayload, response: Response):
-  try:
-    job_description = payload.job_description
-    job_description.strip()
-    max_char_count = 5000
-    if len(job_description) <= max_char_count:
-      response.status_code = status.HTTP_200_OK
-      return {
-        "message": "Job description submitted successfully.",
-        "status": "success"
-      }
-    else:
-      response.status_code = status.HTTP_400_BAD_REQUEST
-      return {
-        "error": "Job description exceeds character limit.",
-        "status": "error"
-      }
-  except Exception as e: 
-    return {"error": str(e)}
+    try:
+      job_description = payload.job_description
+      job_description.strip()
+      max_char_count = 5000
+      if len(job_description) <= max_char_count:
+        response.status_code = status.HTTP_200_OK
+        return {
+          "message": "Job description submitted successfully.",
+          "status": "success"
+        }
+      else:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {
+          "error": "Job description exceeds character limit.",
+          "status": "error"
+        }
+    except Exception as e: 
+      return {"error": str(e)}
 
+def extract_text_from_pdf(file):
+    """
+    Extract text from a PDF file and clean up unnecessary line breaks and whitespace.
+
+    Args:
+        file: The PDF file to extract text from.
+    
+    Returns:
+        str: The cleaned text extracted from the PDF.
+    """
+    try:
+        reader = PdfReader(file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() or ""  # Handle cases where text extraction might return None
+        return " ".join(text.split())  # Remove extraneous whitespace
+    except Exception as e:
+        raise ValueError(f"Failed to extract text from PDF: {str(e)}")

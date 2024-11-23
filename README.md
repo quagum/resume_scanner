@@ -41,3 +41,7 @@
 - docker-compose up
 - **View Backend at http://127.0.0.1:8000**
 - **View Frontend at http://127.0.0.1:3006**
+
+## Run unit tests
+- docker-compose build tests
+- docker-compose up tests
