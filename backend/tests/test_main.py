@@ -1,12 +1,15 @@
 from fastapi.testclient import TestClient
 from backend.database.models import User
-from ..main import app, get_db
+from backend.main import app, get_db, extract_text_from_pdf
 from unittest.mock import MagicMock
 import pytest
 import os
 from io import BytesIO
 import jwt
 import bcrypt
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from PyPDF2 import PdfReader
 """
 Setup and helper
 """
@@ -29,6 +32,14 @@ register_payload_1 = {
     "password": "securePassword123",
     "username": "testuser"
 }
+
+def create_pdf_in_memory(text):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    c.drawString(100, 750, text)
+    c.save()
+    buffer.seek(0)
+    return buffer
 
 """
 Tests
@@ -102,7 +113,7 @@ def test_login_nonexistent_user(mock_db_session):
     assert data["error"] == "Email or password is not recognized"
 
 def test_successful_resume_upload():
-    file_content = BytesIO(b"%PDF-1.4 This is a test PDF file.")
+    file_content = create_pdf_in_memory("Hello World")
     response = client.post(
         "/api/resume-upload",
         files={"file": ("test.pdf", file_content, "application/pdf")},
@@ -122,13 +133,24 @@ def test_fail_resume_upload_invalid_file_type():
     assert response.json()["status"] == "error"
 
 def test_fail_resume_upload_oversized_file():
-    oversized_file = BytesIO(b"A" * (2 * 1024 * 1024 * 1024 + 1))
+    oversized_file = BytesIO(b"A" * (2 * 1024 * 1024 + 1))
     response = client.post(
         "/api/resume-upload",
         files={"file": ("large.pdf", oversized_file, "application/pdf")},
     )
     assert response.status_code == 400
-    assert response.json()["error"] == "File size exceeds the 2GB limit."
+    assert response.json()["error"] == "File size exceeds the 2MB limit."
+    assert response.json()["status"] == "error"
+
+def test_fail_resume_upload_exceeds_character_limit():
+    long_text = "A" * 5001
+    long_text_pdf = create_pdf_in_memory(long_text)
+    response = client.post(
+        "/api/resume-upload",
+        files={"file": ("long.pdf", long_text_pdf, "application/pdf")},
+    )
+    assert response.status_code == 400
+    assert response.json()["error"] == "File contains more than 5,000 characters."
     assert response.json()["status"] == "error"
 
 def test_sucessful_job_description_upload():
@@ -154,3 +176,28 @@ def test_fail_job_description_upload_invalid_length():
     assert response.status_code == 400
     assert response.json()["error"] == "Job description exceeds character limit."
     assert response.json()["status"] == "error"
+
+def test_extract_text_from_pdf_success():
+    sample_pdf_valid = create_pdf_in_memory("Hello World")
+    text = extract_text_from_pdf(sample_pdf_valid)
+    assert text.strip() == "Hello World", f"Unexpected text extracted: {text}"
+
+def test_extract_text_from_pdf_empty():
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    c.save()
+    buffer.seek(0)
+    sample_pdf_empty = buffer
+    text = extract_text_from_pdf(sample_pdf_empty)
+    assert text == "", f"Unexpected text extracted: {text}"
+
+def test_extract_text_from_pdf_whitespace_cleanup():
+    sample_pdf_with_whitespace = create_pdf_in_memory("Hello   World")
+    text = extract_text_from_pdf(sample_pdf_with_whitespace)
+    assert text.strip() == "Hello World", f"Unexpected text extracted: {text}"
+
+def test_extract_text_from_pdf_invalid_pdf():
+    invalid_pdf = BytesIO(b"This is not valid PDF content")
+    with pytest.raises(ValueError) as excinfo:
+        extract_text_from_pdf(invalid_pdf)
+    assert "Failed to extract text from PDF" in str(excinfo.value)

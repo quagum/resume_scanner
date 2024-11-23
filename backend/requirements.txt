@@ -9,6 +9,8 @@ sqlalchemy==2.0.21
 bcrypt
 pyjwt
 python-multipart
+PyPDF2
+reportlab
 
 # Testing 
 httpx
