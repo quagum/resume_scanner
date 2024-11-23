@@ -114,15 +114,23 @@ async def resume_upload(file: UploadFile, response: Response):
     # Extract and validate text
     try:
         text = extract_text_from_pdf(io.BytesIO(file_content))
-        if len(text) > 5000:
+        current_char_count = len(text)
+        if current_char_count > 5000:
             response.status_code = status.HTTP_400_BAD_REQUEST
-            return {"error": "File contains more than 5,000 characters.", "status": "error"}
+            return {
+                "error": "File contains more than 5,000 characters.",
+                "status": "error",
+                "exceeded_by": current_char_count - 5000
+            }
+        response.status_code = status.HTTP_200_OK
+        return {
+            "message": "Resume uploaded successfully.",
+            "status": "success",
+            "character_count": current_char_count
+        }
     except ValueError as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"error": f"Error processing PDF: {str(e)}", "status": "error"}
-
-    response.status_code = status.HTTP_200_OK
-    return {"message": "Resume uploaded successfully.", "status": "success"}
       
 @app.post("/api/job-description")
 async def job_description_upload(payload: JobDescriptionPayload, response: Response):
