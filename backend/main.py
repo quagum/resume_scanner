@@ -151,8 +151,12 @@ async def job_description_upload(payload: JobDescriptionPayload, response: Respo
         session_id = next(iter(temp_storage), None)
         if session_id:
            temp_storage[session_id]["job_description"] = job_description
-           resume_text = temp_storage[session_id]["resume_text"]
-           del temp_storage[session_id]
+           
+           #del temp_storage[session_id] 
+           '''
+           ??? why does it delete the data here?
+           shouldn't be deleting the data when we have "processed" it aka passed it through to the AI?
+           '''
            response.status_code = status.HTTP_200_OK
            return {
                "message": "Job description submitted successfully.",
@@ -165,11 +169,11 @@ async def job_description_upload(payload: JobDescriptionPayload, response: Respo
             "status": "error"
           }
       else:
-         response.status_code = status.HTTP_400_BAD_REQUEST
-         return {
-             "error": "Job description exceeds character limit.",
-             "status": "error"
-         }
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {
+            "error": "Job description exceeds character limit.",
+            "status": "error"
+        }
     except Exception as e: 
       return {"error": str(e)}
 
