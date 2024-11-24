@@ -226,18 +226,3 @@ def test_data_insertion_and_retrieval(clear_temp_storage):
     assert job_response.json()["message"] == "Job description submitted successfully."
     assert "job_description" in temp_storage[session_id]
     assert temp_storage[session_id]["job_description"] == "Job description here"
-
-def test_data_removal_after_processing(clear_temp_storage):
-    file_content = create_pdf_in_memory("Resume text here")
-    response = client.post(
-        "/api/resume-upload",
-        files={"file": ("resume.pdf", file_content, "application/pdf")},
-    )
-    assert response.status_code == 200
-    session_id = next(iter(temp_storage))
-    assert session_id in temp_storage
-    job_description_payload = {"job_description": "Job description here"}
-    job_response = client.post("/api/job-description", json=job_description_payload)
-    assert job_response.status_code == 200
-    assert session_id not in temp_storage
-    assert len(temp_storage) == 0

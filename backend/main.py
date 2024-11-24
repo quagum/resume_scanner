@@ -151,12 +151,6 @@ async def job_description_upload(payload: JobDescriptionPayload, response: Respo
         session_id = next(iter(temp_storage), None)
         if session_id:
            temp_storage[session_id]["job_description"] = job_description
-           
-           #del temp_storage[session_id] 
-           '''
-           ??? why does it delete the data here?
-           shouldn't be deleting the data when we have "processed" it aka passed it through to the AI?
-           '''
            response.status_code = status.HTTP_200_OK
            return {
                "message": "Job description submitted successfully.",
