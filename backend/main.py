@@ -9,8 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import models
 from user_models import RegisterPayload, LoginPayload, JobDescriptionPayload
 from PyPDF2 import PdfReader
+import uuid
 
 resume_file_content = io.BytesIO()
+
+temp_storage = {}
 
 app = FastAPI()
 
@@ -122,11 +125,17 @@ async def resume_upload(file: UploadFile, response: Response):
                 "status": "error",
                 "exceeded_by": current_char_count - 5000
             }
+        
+        #Create a session ID to store data
+        session_id = str(uuid.uuid4())
+        temp_storage[session_id] = {"resume_text": text}
+
         response.status_code = status.HTTP_200_OK
         return {
             "message": "Resume uploaded successfully.",
             "status": "success",
-            "character_count": current_char_count
+            "character_count": current_char_count,
+            "session_id": session_id
         }
     except ValueError as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
@@ -139,16 +148,25 @@ async def job_description_upload(payload: JobDescriptionPayload, response: Respo
       job_description.strip()
       max_char_count = 5000
       if len(job_description) <= max_char_count:
-        response.status_code = status.HTTP_200_OK
-        return {
-          "message": "Job description submitted successfully.",
-          "status": "success"
-        }
+        session_id = next(iter(temp_storage), None)
+        if session_id:
+           temp_storage[session_id]["job_description"] = job_description
+           response.status_code = status.HTTP_200_OK
+           return {
+               "message": "Job description submitted successfully.",
+               "status": "success"
+           }
+        else:
+          response.status_code = status.HTTP_400_BAD_REQUEST
+          return {
+            "error": "No resume uploaded.",
+            "status": "error"
+          }
       else:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {
-          "error": "Job description exceeds character limit.",
-          "status": "error"
+            "error": "Job description exceeds character limit.",
+            "status": "error"
         }
     except Exception as e: 
       return {"error": str(e)}

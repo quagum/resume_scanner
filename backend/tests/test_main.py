@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 from backend.database.models import User
-from backend.main import app, get_db, extract_text_from_pdf
+from backend.main import app, get_db, extract_text_from_pdf, temp_storage
 from unittest.mock import MagicMock
 import pytest
 import os
@@ -26,6 +26,12 @@ app.dependency_overrides[get_db] = override_get_db
 @pytest.fixture
 def mock_db_session():
     return mock_session
+
+@pytest.fixture
+def clear_temp_storage():
+    temp_storage.clear()
+    yield
+    temp_storage.clear()
 
 register_payload_1 = {
     "email": "test@example.com",
@@ -201,3 +207,22 @@ def test_extract_text_from_pdf_invalid_pdf():
     with pytest.raises(ValueError) as excinfo:
         extract_text_from_pdf(invalid_pdf)
     assert "Failed to extract text from PDF" in str(excinfo.value)
+
+def test_data_insertion_and_retrieval(clear_temp_storage):
+    file_content = create_pdf_in_memory("Resume text here")
+    response = client.post(
+        "/api/resume-upload",
+        files={"file": ("resume.pdf", file_content, "application/pdf")},
+    )
+    assert response.status_code == 200
+    assert response.json()["message"] == "Resume uploaded successfully."
+    session_id = next(iter(temp_storage))
+    assert session_id in temp_storage 
+    assert "resume_text" in temp_storage[session_id]
+    assert temp_storage[session_id]["resume_text"] == "Resume text here"
+    job_description_payload = {"job_description": "Job description here"}
+    job_response = client.post("/api/job-description", json=job_description_payload)
+    assert job_response.status_code == 200
+    assert job_response.json()["message"] == "Job description submitted successfully."
+    assert "job_description" in temp_storage[session_id]
+    assert temp_storage[session_id]["job_description"] == "Job description here"
