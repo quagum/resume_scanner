@@ -5,7 +5,7 @@ import "./components/style.css";
 const App: React.FC = () => {
   return (
     <div>
-      <ResumeJobInputForm />
+      <ResumeJobInputForm/>
     </div>
   );
 };
