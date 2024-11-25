@@ -29,12 +29,12 @@ const FileInput: React.FC<FileInputProps> = ({ label }) => {
 
   return (
     <div>
-      <label>
-        {label}
+      <label className="input-label">{label}</label>
+      <div>
         <input type="file" accept=".pdf,.docx" onChange={handleFileUpload} />
-      </label>
+      </div>
     </div>
   );
-};
 
+};
 export default FileInput;
