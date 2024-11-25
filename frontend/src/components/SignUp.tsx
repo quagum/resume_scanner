@@ -14,11 +14,15 @@ const SignUp: React.FC = () => {
         username: "", 
 
     });
+    const [passwordStrength, setPasswordStrength] = useState("")
     const [error, setError] = useState("");
     
     //Setting values for formData after user input
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        if (e.target.name === "password") {
+            setPasswordStrength(checkPasswordStrength(e.target.value));
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -27,6 +31,11 @@ const SignUp: React.FC = () => {
         //Validate passwords match
         if (formData.password !== formData.confirmPassword) {
             setError("Passwords do not match.");
+            return;
+        }
+
+        if (passwordStrength === "Weak") {
+            setError("Password is too weak.");
             return;
         }
 
@@ -48,6 +57,23 @@ const SignUp: React.FC = () => {
             alert("Failed to register account. Please try again.");
             setError("Registration failed");
         }
+    };
+
+    const checkPasswordStrength = (password: string): string => {
+        const strengthCriteria = [
+            { regex: /.{8,}/, message: "at least 8 characters" },
+            { regex: /[A-Z]/, message: "an uppercase letter" },
+            { regex: /[a-z]/, message: "a lowercase letter" },
+            { regex: /[0-9]/, message: "a number" },
+            { regex: /[^A-Za-z0-9]/, message: "a special character" },
+        ];
+
+        const passedCriteria = strengthCriteria.filter(criteria => criteria.regex.test(password)).length;
+        console.log("Password strength criteria met:", passedCriteria); // Debugging
+
+        if (passedCriteria === 5) return "Strong";
+        if (passedCriteria >= 3) return "Moderate";
+        return "Weak";
     };
 
     return (
@@ -76,6 +102,11 @@ const SignUp: React.FC = () => {
                         value={formData.password}
                         onChange={handleChange}
                     />
+                    {passwordStrength && (
+                        <p className={`password-strength ${passwordStrength.toLowerCase()}`}>
+                            Password Strength: {passwordStrength}
+                        </p>
+                    )}
                     <input
                         type="password"
                         name="confirmPassword"
