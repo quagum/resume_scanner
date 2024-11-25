@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import axios from "axios";
 import { BrowserRouter as Router, useNavigate } from "react-router-dom";
 import Login from "../components/Login";
+import '@testing-library/jest-dom';
 
 // Mock axios and useNavigate
 jest.mock("axios");
