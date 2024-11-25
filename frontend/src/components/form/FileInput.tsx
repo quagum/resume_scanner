@@ -1,4 +1,4 @@
-import React from "react";
+import React , {useState} from "react";
 import axios from "axios";
 import "../../styles/form/file_input.css"
 
@@ -7,12 +7,15 @@ interface FileInputProps {
 }
 
 const FileInput: React.FC<FileInputProps> = ({ label }) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false); 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const formData = new FormData();
     formData.append("file", file);
+
+    setIsLoading(true); // show
 
     try {
       const response = await axios.post("http://localhost:8000/api/resume-upload", formData, {
@@ -24,6 +27,8 @@ const FileInput: React.FC<FileInputProps> = ({ label }) => {
     } catch (error) {
       console.error(error);
       alert("Failed to upload the resume. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
