@@ -2,9 +2,9 @@
 
 # BACKEND
 /backend/__pycache__
-
-# FRONTEND 
-/frontend/node_modules
 /backend/database/__pycache__
 /backend/tests/__pycache__
 backend/database/database.db
+# FRONTEND 
+/frontend/node_modules
+/frontend/coverage

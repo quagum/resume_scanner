@@ -53,7 +53,13 @@
     },
     "moduleNameMapper": {
       "^axios$": "axios/dist/node/axios.cjs"
-    }
+    },
+    "coveragePathIgnorePatterns": [
+      "App.tsx",
+      "index.tsx",
+      "reportWebVitals.ts",
+      "<rootDir>/src/components/shared"
+    ]
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.0",
